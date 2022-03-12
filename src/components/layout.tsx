@@ -24,6 +24,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import {
+  Link,
   Button,
   IconButton,
   ListItemButton
@@ -33,17 +34,8 @@ import { useLocation } from '@reach/router';
 
 import { graphql, useStaticQuery } from 'gatsby'
 
-interface ToolListItemData {
-  name: string,
-  new: boolean,
-  type: string,
-  path: string
-}
+import { ToolListItemData, ToolCategoryData } from './interface'
 
-interface ToolCategoryData {
-  id: string,
-  name: string
-}
 
 const drawerWidth = 240;
 
@@ -77,7 +69,7 @@ export default function Layout({ children }) {
           toolList {
             name
             new
-            path
+            toolPath
             type
           }
           category {
@@ -216,6 +208,13 @@ export default function Layout({ children }) {
     <Box sx={{ p: 1 }}>
       <Box sx={{ overflow: 'auto' }}>
         <List dense>
+          <Box>
+            <ListItemButton sx={ListItemSx} to='/' selected={location.pathname === '/'}>
+            <ListItemText primary='首页' sx={{
+                        color: theme.palette.text.primary,
+                      }} />
+            </ListItemButton>
+          </Box>
           {categoryData.map((cdata, index) => (
             <Box key={cdata.id}>
               <ListItemButton onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [cdata.id]: !drawerCollapseState[cdata.id] }) }}>
@@ -225,7 +224,7 @@ export default function Layout({ children }) {
               <Collapse in={drawerCollapseState[cdata.id]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
                   {toolListData.filter((data) => (((cdata.id) === 'new') ? data.new : (data.type === cdata.id))).map((data, index) => (
-                    <ListItemButton key={index} sx={ListItemSx} to={data.path} selected={data.path === location.pathname && cdata.id !== 'new'} onClick={()=>{setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true })}}>
+                    <ListItemButton key={index} sx={ListItemSx} to={data.toolPath} selected={data.toolPath === location.pathname && cdata.id !== 'new'} onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
                       <ListItemText primary={data.name} sx={{
                         color: theme.palette.text.primary,
                       }} />

@@ -2,7 +2,6 @@ import * as React from "react"
 import { styled, useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   Box,
-  Button,
   Typography,
   Paper,
   useMediaQuery,
@@ -10,10 +9,14 @@ import {
   Card,
   CardContent,
   CardActions,
-  Link,
   Grid
 } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+
+import {
+  Link,
+  Button,
+} from 'gatsby-theme-material-ui';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGithub, faBilibili } from '@fortawesome/free-brands-svg-icons'
@@ -67,7 +70,7 @@ const IndexPage = () => {
                       </Box>
                     </CardContent>
                     <CardActions>
-                      <Button size="small">尝试一下</Button>
+                      <Button size="small" to='/arc-cutter'>尝试一下</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -84,7 +87,7 @@ const IndexPage = () => {
                       </Box>
                     </CardContent>
                     <CardActions>
-                      <Button size="small">尝试一下</Button>
+                      <Button size="small" to='/chart-offset'>尝试一下</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -101,7 +104,7 @@ const IndexPage = () => {
                       </Box>
                     </CardContent>
                     <CardActions>
-                      <Button size="small">尝试一下</Button>
+                      <Button size="small" to='/timing-easing'>尝试一下</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -113,16 +116,16 @@ const IndexPage = () => {
           <CardContent sx={{ pt: 3 }}>
             <Stack spacing={2}>
               <Stack spacing={1} direction={{xs: 'column', sm: 'row'}}>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />}>
+                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/aff-toolbox-react'>
                   GitHub（前端）
                 </Button>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />}>
+                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/arcfapi'>
                   GitHub（后端）
                 </Button>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faBilibili} />}>
+                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faBilibili} />} href='https://space.bilibili.com/2095080'>
                   Bilibili
                 </Button>
-                <Button variant="outlined" startIcon={<MailOutlineIcon />}href="mailto:canis@direcore.xyz">
+                <Button variant="outlined" startIcon={<MailOutlineIcon />} href="mailto:canis@direcore.xyz">
                   canis@direcore.xyz
                 </Button>
               </Stack>
