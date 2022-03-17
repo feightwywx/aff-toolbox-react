@@ -69,7 +69,7 @@ export default function Layout({ children }) {
           toolList {
             name
             new
-            toolPath
+            id
             type
           }
           category {
@@ -224,7 +224,7 @@ export default function Layout({ children }) {
               <Collapse in={drawerCollapseState[cdata.id]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
                   {toolListData.filter((data) => (((cdata.id) === 'new') ? data.new : (data.type === cdata.id))).map((data, index) => (
-                    <ListItemButton key={index} sx={ListItemSx} to={data.toolPath} selected={data.toolPath === location.pathname && cdata.id !== 'new'} onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
+                    <ListItemButton key={index} sx={ListItemSx} to={data.id} selected={data.id === location.pathname && cdata.id !== 'new'} onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
                       <ListItemText primary={data.name} sx={{
                         color: theme.palette.text.primary,
                       }} />

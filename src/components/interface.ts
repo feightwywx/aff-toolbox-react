@@ -2,7 +2,7 @@ export interface ToolListItemData {
   name: string,
   new: boolean,
   type: string,
-  toolPath: string
+  id: string
 }
 
 export interface ToolCategoryData {
