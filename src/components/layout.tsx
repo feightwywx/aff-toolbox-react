@@ -218,14 +218,14 @@ export default function Layout({ children }) {
           {categoryData.map((cdata, index) => (
             <Box key={cdata.id}>
               <ListItemButton onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [cdata.id]: !drawerCollapseState[cdata.id] }) }}>
-                <ListItemText primary={cdata.name} />
+                <ListItemText primary={`${cdata.id}.name`} />
                 {drawerCollapseState[cdata.id] ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
               <Collapse in={drawerCollapseState[cdata.id]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
                   {toolListData.filter((data) => (((cdata.id) === 'new') ? data.new : (data.type === cdata.id))).map((data, index) => (
                     <ListItemButton key={index} sx={ListItemSx} to={data.id} selected={data.id === location.pathname && cdata.id !== 'new'} onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
-                      <ListItemText primary={data.name} sx={{
+                      <ListItemText primary={`${data.id}.name`} sx={{
                         color: theme.palette.text.primary,
                       }} />
                     </ListItemButton>

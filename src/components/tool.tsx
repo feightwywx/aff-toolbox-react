@@ -16,8 +16,8 @@ export default function toolPage({ data }) {
     <Box>
       <Stack spacing={2} sx={{ mb: 2 }}>
         <Box>
-          <Typography variant={isDesktop ? 'h1' : 'h3'}>{pageName}</Typography>
-          <Typography variant="h6">{pageName}.shortDesc</Typography>
+          <Typography variant={isDesktop ? 'h1' : 'h3'}>{pageId}.name</Typography>
+          <Typography variant="h6">{pageId}.shortDesc</Typography>
         </Box>
       </Stack>
     </Box>

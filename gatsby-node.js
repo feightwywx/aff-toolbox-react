@@ -30,8 +30,7 @@ exports.createPages = async function ({ actions, graphql }) {
         pagePath: '/' + tool.id,
         name: tool.name,
         form: tool.form
-      },
-      defer: true
+      }
     })
   })
 }
