@@ -1,67 +1,15 @@
-import React from "react"
-import { styled, useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
-import {
-  AppBar,
-  Badge,
-  Box,
-  CssBaseline,
-  Container,
-  Collapse,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  Toolbar,
-  Typography,
-  MenuItem,
-  Menu
-} from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import MenuIcon from '@mui/icons-material/Menu';
-import MoreIcon from '@mui/icons-material/MoreVert';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  Link,
-  Button,
-  IconButton,
-  ListItemButton
-} from 'gatsby-theme-material-ui';
+import { Container, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
+import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
+import { graphql, useStaticQuery } from 'gatsby';
+
+import Header from './header';
 import { Helmet } from 'react-helmet';
-import { useLocation } from '@reach/router';
+import PropTypes from 'prop-types';
+import React from 'react';
 
-import { graphql, useStaticQuery } from 'gatsby'
+export const LayoutContext = React.createContext({})
 
-import { ToolListItemData, ToolCategoryData } from './interface'
-
-
-const drawerWidth = 240;
-
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(3),
-  transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
-}));
-
-
-export default function Layout({ children }) {
-  const location = useLocation();
-
+const Layout = ({ children }) => {
   const toolData = useStaticQuery(graphql`query ToolListQuery {
     allConfigJson {
       edges {
@@ -81,10 +29,6 @@ export default function Layout({ children }) {
     }
   }`)['allConfigJson']['edges'][0]['node']
 
-  const toolListData = toolData['toolList'] as Array<ToolListItemData>
-  const categoryData = toolData['category'] as Array<ToolCategoryData>
-
-  // 样式
   const theme = createTheme(
     {
       palette: {
@@ -156,208 +100,70 @@ export default function Layout({ children }) {
     }
   );
 
-  const ListItemSx = {
-    borderRadius: 2,
-    p: 0.5,
-    pl: 2,
-    mt: 0.5,
-    color: theme.palette.primary.main,
-  }
-
-  const MenuItemSx = {
-    borderRadius: 1,
-    p: 1,
-    m: 0.5,
-    ml: 1,
-    mr: 1,
-    // 可以hack掉ripple颜色 但是会导致动画出现问题
-    // [`& .MuiTouchRipple-root span`]: {
-    //  backgroundColor: theme.palette.primary.main
-    // }
-  }
-
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
-  // 菜单
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
-  // 抽屉
-
+  const drawerWidth = 240;
   const [drawerOpen, setDrawerOpen] = React.useState(isDesktop ? true : false);
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  const [drawerCollapseState, setDrawerCollapseState] = React.useState({
-    new: true,
-    chart: false,
-    arc: false,
-    timing: false,
-    gadget: false,
-  });
-  const handleDrawerCollapse = () => {
+  // const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  //   open?: boolean;
+  // }>(({ theme, open }) => ({
+  //   flexGrow: 1,
+  //   padding: theme.spacing(3),
+  //   transition: theme.transitions.create('margin', {
+  //     easing: theme.transitions.easing.sharp,
+  //     duration: theme.transitions.duration.leavingScreen,
+  //   }),
+  //   marginLeft: `0px`,
+  //   ...(open && {
+  //     transition: theme.transitions.create('margin', {
+  //       easing: theme.transitions.easing.easeOut,
+  //       duration: theme.transitions.duration.enteringScreen,
+  //     }),
+  //     marginLeft: `${drawerWidth}px`,
+  //   }),
+  // }));
 
-  }
-
-  const drawerContent = (
-    <Box sx={{ p: 1 }}>
-      <Box sx={{ overflow: 'auto' }}>
-        <List dense>
-          <Box>
-            <ListItemButton sx={ListItemSx} to='/' selected={location.pathname === '/'}>
-            <ListItemText primary='首页' sx={{
-                        color: theme.palette.text.primary,
-                      }} />
-            </ListItemButton>
-          </Box>
-          {categoryData.map((cdata, index) => (
-            <Box key={cdata.id}>
-              <ListItemButton onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [cdata.id]: !drawerCollapseState[cdata.id] }) }}>
-                <ListItemText primary={`${cdata.id}.name`} />
-                {drawerCollapseState[cdata.id] ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-              <Collapse in={drawerCollapseState[cdata.id]} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding dense sx={{ pl: 2 }}>
-                  {toolListData.filter((data) => (((cdata.id) === 'new') ? data.new : (data.type === cdata.id))).map((data, index) => (
-                    <ListItemButton key={index} sx={ListItemSx} to={data.id} selected={data.id === location.pathname && cdata.id !== 'new'} onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
-                      <ListItemText primary={`${data.id}.name`} sx={{
-                        color: theme.palette.text.primary,
-                      }} />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Collapse>
-            </Box>
-          ))}
-        </List>
-      </Box>
-    </Box>
-  )
+  const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+    open?: boolean;
+  }>(({ theme, open }) => (
+    open ? {
+      flexGrow: 1,
+      padding: theme.spacing(3),
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: `${drawerWidth}px`,
+    } : {
+      flexGrow: 1,
+      padding: theme.spacing(3),
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      marginLeft: `0px`,
+    }
+  ));
 
   return (
-    <Box>
+    <>
       <Helmet>
         <link href="https://fonts.font.im/css?family=Exo+2:300,400,500,700&display=swap" rel="stylesheet" />
         <link href="https://fonts.font.im/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
       </Helmet>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box sx={{ display: 'flex' }}>
-          <AppBar
-            position="fixed"
-            sx={{
-              zIndex: (theme) => theme.zIndex.drawer + 1,
-              borderRadius: 0
-            }}
-            elevation={0}
-          >
-            <Toolbar sx={{
-              backgroundColor: theme.palette.primary.light,
-              color: theme.palette.primary.dark,
-              borderBottomStyle: 'none',
-              borderBottomColor: theme.palette.divider,
-              borderBottomWidth: '1px'
-            }}
-            >
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                sx={{ mr: 2 }}
-                onClick={handleDrawer}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Box sx={{ flexGrow: 1 }}>
-                <Badge badgeContent={'beta'} color="secondary">
-                  <Typography variant="h6" component="div" sx={{ pr: 2 }}>
-                    AFF工具箱
-                  </Typography>
-                </Badge>
-              </Box>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <MoreIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose} sx={MenuItemSx}>Arc构造工具</MenuItem>
-                <MenuItem onClick={handleClose} sx={MenuItemSx}>时间细分计算器</MenuItem>
-              </Menu>
-            </Toolbar>
-          </AppBar>
-          {
-            isDesktop ? (
-              <Drawer
-                variant="persistent"
-                sx={{
-                  width: drawerWidth,
-                  flexShrink: 0,
-                  [`& .MuiDrawer-paper`]: {
-                    width: drawerWidth,
-                    boxSizing: 'border-box',
-                    borderRightColor: theme.palette.divider,
-                    backgroundColor: theme.palette.background.default,
-                    borderRadius: 0
-                  },
-                }}
-                anchor="left"
-                open={drawerOpen}
-              >
-                <Toolbar sx={{ mb: 1 }} />
-                {drawerContent}
-              </Drawer>
-            ) : (  // mobile
-              <Box>
-                <Drawer
-                  variant="temporary"
-                  open={drawerOpen}
-                  onClose={handleDrawer}
-                  ModalProps={{
-                    keepMounted: true, // Better open performance on mobile.
-                  }}
-                  sx={{
-                    '& .MuiDrawer-paper': {
-                      boxSizing: 'border-box',
-                      width: drawerWidth,
-                      mt: { 'xs': 9, 'sm': 10 },
-                      ml: 2,
-                      height: '70%',
-                      borderRadius: 4
-                    },
-                  }}
-                  elevation={8}
-                >
-                  {drawerContent}
-                </Drawer>
-              </Box>
-            )
-          }
+        <LayoutContext.Provider
+          value={{
+            drawerOpen, setDrawerOpen, handleDrawer
+          }}>
+          <Header toolData={toolData} />
+        </LayoutContext.Provider>
+        <Container>
           {
             isDesktop ? (
               <Main open={drawerOpen}>
@@ -373,9 +179,19 @@ export default function Layout({ children }) {
               </Container>
             )
           }
-
-        </Box>
+          <footer>
+            © {new Date().getFullYear()}, Built with
+            {` `}
+            <a href="https://www.gatsbyjs.org">Gatsby</a>
+          </footer>
+        </Container>
       </ThemeProvider>
-    </Box>
-  )
-}
+    </>
+  );
+};
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
+export default Layout;

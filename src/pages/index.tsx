@@ -1,26 +1,27 @@
 import * as React from "react"
-import { styled, useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
+
 import {
   Box,
-  Typography,
-  Paper,
-  useMediaQuery,
-  Stack,
   Card,
-  CardContent,
   CardActions,
-  Grid
+  CardContent,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+  useMediaQuery
 } from '@mui/material';
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
-
 import {
-  Link,
   Button,
+  Link,
 } from 'gatsby-theme-material-ui';
+import {Link as GatsbyLink, graphql} from 'gatsby';
+import { Link as I18Link, Trans, useTranslation } from 'gatsby-plugin-react-i18next';
+import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
+import { faBilibili, faGithub } from '@fortawesome/free-brands-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGithub, faBilibili } from '@fortawesome/free-brands-svg-icons'
-
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 // markup
 const IndexPage = () => {
@@ -138,4 +139,18 @@ const IndexPage = () => {
   )
 }
 
-export default IndexPage
+export default IndexPage;
+
+export const query = graphql`
+  query ($language: String!) {
+    locales: allLocale(filter: {ns: {in: ["common", "index"]}, language: {eq: $language}}) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+  }
+`;
