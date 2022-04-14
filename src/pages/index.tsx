@@ -13,15 +13,15 @@ import {
 } from '@mui/material';
 import {
   Button,
-  Link,
+  Link as GatsbyLink,
 } from 'gatsby-theme-material-ui';
-import {Link as GatsbyLink, graphql} from 'gatsby';
 import { Link as I18Link, Trans, useTranslation } from 'gatsby-plugin-react-i18next';
 import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
 import { faBilibili, faGithub } from '@fortawesome/free-brands-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { graphql } from 'gatsby';
 
 // markup
 const IndexPage = () => {
@@ -51,7 +51,7 @@ const IndexPage = () => {
               <Typography />
               <Typography variant="h5">我应该使用哪些工具呢？</Typography>
               <Typography variant="body1">
-                这个<Link href='https://www.bilibili.com/video/BV1RR4y1J7sL' underline="hover" color='secondary'>介绍视频</Link>有各个工具的结果预览，
+                这个<GatsbyLink href='https://www.bilibili.com/video/BV1RR4y1J7sL' underline="hover" color='secondary'>介绍视频</GatsbyLink>有各个工具的结果预览，
                 请根据您的需要选用。同时，向您推荐这几个最受欢迎的工具：
               </Typography>
               <Grid container spacing={{ xs: 1, md: 2 }}
