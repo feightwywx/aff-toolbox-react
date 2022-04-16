@@ -16,12 +16,12 @@ import {
   Link as GatsbyLink,
 } from 'gatsby-theme-material-ui';
 import { Link as I18Link, Trans, useTranslation } from 'gatsby-plugin-react-i18next';
-import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
-import { faBilibili, faGithub } from '@fortawesome/free-brands-svg-icons'
+import { faBilibili, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { graphql } from 'gatsby';
+import { useTheme } from '@mui/material/styles';
 
 // markup
 const IndexPage = () => {
@@ -118,13 +118,16 @@ const IndexPage = () => {
             <Stack spacing={2}>
               <Stack spacing={1} direction={{xs: 'column', sm: 'row'}}>
                 <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/aff-toolbox-react'>
-                  GitHub（前端）
+                  前端
                 </Button>
                 <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/arcfapi'>
-                  GitHub（后端）
+                  API
                 </Button>
                 <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faBilibili} />} href='https://space.bilibili.com/2095080'>
-                  Bilibili
+                  一只恐狼
+                </Button>
+                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faTwitter} />} href='https://twitter.com/0x00F8'>
+                  @0x00F8
                 </Button>
                 <Button variant="outlined" startIcon={<MailOutlineIcon />} href="mailto:canis@direcore.xyz">
                   canis@direcore.xyz

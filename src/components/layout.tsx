@@ -5,10 +5,8 @@ import {
   Collapse,
   Container,
   CssBaseline,
-  Divider,
   Drawer,
   List,
-  ListItem,
   ListItemText,
   Menu,
   MenuItem,
@@ -22,17 +20,17 @@ import {
   ListItemButton
 } from 'gatsby-theme-material-ui';
 import { Link as I18Link, useI18next } from 'gatsby-plugin-react-i18next';
-import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { ToolCategoryData, ToolListItemData } from './interface'
 import { graphql, useStaticQuery } from 'gatsby'
 
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Helmet } from 'react-helmet';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import React from "react"
+import TranslateIcon from '@mui/icons-material/Translate';
 import { useLocation } from '@reach/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -48,7 +46,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: `-${drawerWidth}px`,
-  ...(open && {
+  ...((open === true) && {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -60,7 +58,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function Layout({ children }) {
   const location = useLocation();
-  const { languages, originalPath, t } = useI18next();
+  const { languages, originalPath, t, i18n } = useI18next();
 
   const toolData = useStaticQuery(graphql`query ToolListQuery {
     allConfigJson {
@@ -176,18 +174,24 @@ export default function Layout({ children }) {
     // }
   }
 
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  console.log(`Desktop: ${isDesktop}`)
   // 菜单
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [langAnchorEl, setLangAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const handleLangMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setLangAnchorEl(event.currentTarget);
+  };
   const handleClose = () => {
     setAnchorEl(null);
+    setLangAnchorEl(null);
   };
 
   // 抽屉
-
+  // FIXME 暂时无效：noSsr会导致初次渲染错误，Ssr会导致初值false，无法打开抽屉
   const [drawerOpen, setDrawerOpen] = React.useState(isDesktop ? true : false);
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -201,6 +205,7 @@ export default function Layout({ children }) {
     gadget: false,
   });
 
+  // FIXME 当前页面的标记有些问题 可能是路由导致
   const drawerContent = (
     <Box sx={{ p: 1 }}>
       <Box sx={{ overflow: 'auto' }}>
@@ -278,9 +283,39 @@ export default function Layout({ children }) {
                   </Typography>
                 </Badge>
               </Box>
+              
               <IconButton
                 size="large"
-                aria-label="account of current user"
+                aria-label="language"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleLangMenu}
+                color="inherit"
+              >
+                <TranslateIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={langAnchorEl}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(langAnchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='zh'>中文</MenuItem>
+                <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='en'>English</MenuItem>
+              </Menu>
+              
+              <IconButton
+                size="large"
+                aria-label="menu"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleMenu}
