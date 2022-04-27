@@ -8,7 +8,7 @@
       "form": {
         "main": [
           {
-            "input": "long",
+            "input": "large",
             "id": "aff",
             "name": "完整谱面或谱面片段"
           },
@@ -20,7 +20,7 @@
             "format": "int"
           }
         ],
-        "more": []
+        "opt": []
       }
     },
     {
@@ -88,6 +88,29 @@
       "type": "timing",
       "id": "timing-stuck",
       "new": true
+    },
+    {
+      "name": "测试页面",
+      "type": "",
+      "id": "test",
+      "new": false,
+      "form": {
+        "main": [
+          {
+            "input": "large",
+            "id": "aff",
+            "name": "完整谱面或谱面片段"
+          },
+          {
+            "input": "half",
+            "id": "offset",
+            "name": "偏移量",
+            "helper": "单位为ms",
+            "format": "int"
+          }
+        ],
+        "opt": []
+      }
     }
   ],
   "category": [

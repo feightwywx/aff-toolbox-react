@@ -30,7 +30,7 @@ const IndexPage = () => {
 
   return (
     <Box>
-      <Stack spacing={2} sx={{mb: 2}}>
+      <Stack spacing={2} sx={{ mb: 2 }}>
         <Box>
           <Typography variant={isDesktop ? 'h1' : 'h3'}>AFF工具箱</Typography>
           <Typography variant="h6">一个Arcaea谱面段落生成工具</Typography>
@@ -116,23 +116,33 @@ const IndexPage = () => {
         <Card>
           <CardContent sx={{ pt: 3 }}>
             <Stack spacing={2}>
-              <Stack spacing={1} direction={{xs: 'column', sm: 'row'}}>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/aff-toolbox-react'>
-                  前端
-                </Button>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/arcfapi'>
-                  API
-                </Button>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faBilibili} />} href='https://space.bilibili.com/2095080'>
-                  一只恐狼
-                </Button>
-                <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faTwitter} />} href='https://twitter.com/0x00F8'>
-                  @0x00F8
-                </Button>
-                <Button variant="outlined" startIcon={<MailOutlineIcon />} href="mailto:canis@direcore.xyz">
-                  canis@direcore.xyz
-                </Button>
-              </Stack>
+              <Grid container spacing={1}>
+                <Grid item xs='auto'>
+                  <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/aff-toolbox-react'>
+                    前端
+                  </Button>
+                </Grid>
+                <Grid item xs='auto'>
+                  <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faGithub} />} href='https://github.com/feightwywx/arcfapi'>
+                    API
+                  </Button>
+                </Grid>
+                <Grid item xs='auto'>
+                  <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faBilibili} />} href='https://space.bilibili.com/2095080'>
+                    一只恐狼
+                  </Button>
+                </Grid>
+                <Grid item xs='auto'>
+                  <Button variant="outlined" startIcon={<FontAwesomeIcon icon={faTwitter} />} href='https://twitter.com/0x00F8'>
+                    @0x00F8
+                  </Button>
+                </Grid>
+                <Grid item xs='auto'>
+                  <Button variant="outlined" startIcon={<MailOutlineIcon />} href="mailto:canis@direcore.xyz">
+                    canis@direcore.xyz
+                  </Button>
+                </Grid>
+              </Grid>
             </Stack>
           </CardContent>
         </Card>

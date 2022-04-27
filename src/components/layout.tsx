@@ -133,6 +133,14 @@ export default function Layout({ children }) {
               color: '#4d57a9'
             }
           }
+        },
+        MuiFab: {
+          styleOverrides: {
+            root: {
+              borderRadius: '16px',
+              padding: '28px 20px',
+            }
+          }
         }
       },
       typography: {
@@ -254,7 +262,8 @@ export default function Layout({ children }) {
             position="fixed"
             sx={{
               zIndex: (theme) => theme.zIndex.drawer + 1,
-              borderRadius: 0
+              borderRadius: 0,
+              backgroundColor: theme.palette.primary.light,
             }}
             elevation={0}
           >
