@@ -1,13 +1,12 @@
 import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
-import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
 import { Trans, useTranslation } from 'react-i18next'
 
 import { FormData } from './interface';
-import Paper from '@mui/material/Paper';
 import { PlayArrow } from '@mui/icons-material';
 import React from "react"
 import { graphql } from "gatsby"
 import { useFormik } from 'formik';
+import { useTheme } from '@mui/material/styles';
 
 export default function toolPage({ data }) {
   const theme = useTheme();
@@ -21,11 +20,11 @@ export default function toolPage({ data }) {
   const pageForm = pageContext['form']
 
   let formikInitValues = {}
-  if (pageForm.hasOwnProperty('main')) {
-    (pageForm.main).map(x => formikInitValues = { [x.id]: '', ...formikInitValues })
+  if (pageForm && 'main' in pageForm) {
+    (pageForm.main).map(x => formikInitValues = { ...formikInitValues , [x.id]: ''})
   }
-  if ('opt' in pageForm) {
-    (pageForm.main).map(x => formikInitValues = { [x.id]: '', ...formikInitValues })
+  if (pageForm && 'opt' in pageForm) {
+    (pageForm.main).map(x => formikInitValues = { ...formikInitValues , [x.id]: '' })
   }
   console.log(pageForm);
   const formik = useFormik({

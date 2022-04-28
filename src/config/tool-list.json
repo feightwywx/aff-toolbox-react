@@ -69,7 +69,11 @@
       "name": "Arc包络",
       "type": "arc",
       "id": "arc-envelope",
-      "new": true
+      "new": true,
+      "form": {
+        "main": [],
+        "opt": []
+      }
     },
     {
       "name": "Timing缓动",

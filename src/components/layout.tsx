@@ -58,6 +58,9 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const pathName = location.pathname.split('\\')
+  const currentPage = pathName[pathName.length - 1]
+  console.log(currentPage)
   const { languages, originalPath, t, i18n } = useI18next();
 
   const toolData = useStaticQuery(graphql`query ToolListQuery {
@@ -199,8 +202,7 @@ export default function Layout({ children }) {
   };
 
   // 抽屉
-  // FIXME 暂时无效：noSsr会导致初次渲染错误，Ssr会导致初值false，无法打开抽屉
-  const [drawerOpen, setDrawerOpen] = React.useState(isDesktop ? true : false);
+  const [drawerOpen, setDrawerOpen] = React.useState(true);
   const handleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -213,7 +215,7 @@ export default function Layout({ children }) {
     gadget: false,
   });
 
-  // FIXME 当前页面的标记有些问题 可能是路由导致
+  // FIXME 直接进入一个子页面时，Collapse状态不正确
   const drawerContent = (
     <Box sx={{ p: 1 }}>
       <Box sx={{ overflow: 'auto' }}>
@@ -234,7 +236,13 @@ export default function Layout({ children }) {
               <Collapse in={drawerCollapseState[cdata.id]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
                   {toolListData.filter((data) => (((cdata.id) === 'new') ? data.new : (data.type === cdata.id))).map((data, index) => (
-                    <ListItemButton key={index} sx={ListItemSx} to={data.id} selected={data.id === location.pathname && cdata.id !== 'new'} onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
+                    <ListItemButton
+                    LinkComponent={I18Link} 
+                    key={index} 
+                    sx={ListItemSx} 
+                    to={`/${data.id}`} 
+                    selected={`/${data.id}` === currentPage && cdata.id !== 'new'} 
+                    onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
                       <ListItemText primary={t(`${data.id}.name`)} sx={{
                         color: theme.palette.text.primary,
                       }} />
@@ -377,7 +385,7 @@ export default function Layout({ children }) {
               <Box>
                 <Drawer
                   variant="temporary"
-                  open={drawerOpen}
+                  open={!drawerOpen}  // 移动端的drawer默认逻辑和桌面端相反
                   onClose={handleDrawer}
                   ModalProps={{
                     keepMounted: true, // Better open performance on mobile.

@@ -6,7 +6,6 @@ import {
   CardActions,
   CardContent,
   Grid,
-  Paper,
   Stack,
   Typography,
   useMediaQuery
@@ -40,7 +39,7 @@ const IndexPage = () => {
             <Stack spacing={2}>
               <Typography variant="h5">这是什么？</Typography>
               <Typography variant="body1">
-                AFF工具箱是一个用于生成Arcaea谱面段落的工具。
+                AFF工具箱是一个用于生成<GatsbyLink href='https://arcaea.lowiro.com/' underline="hover" color='secondary'>Arcaea</GatsbyLink>谱面段落的工具。
                 Arcaea是一款由lowiro开发的<s>创新立体</s>节奏游戏。
               </Typography>
               <Typography />
