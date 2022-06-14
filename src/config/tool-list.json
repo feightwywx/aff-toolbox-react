@@ -1,138 +1,96 @@
 {
   "toolList": [
     {
-      "name": "谱面偏移工具",
       "type": "chart",
       "id": "chart-offset",
       "new": false,
-      "form": {
-        "main": [
-          {
-            "input": "large",
-            "id": "aff",
-            "name": "完整谱面或谱面片段"
-          },
-          {
-            "input": "half",
-            "id": "offset",
-            "name": "偏移量",
-            "helper": "单位为ms",
-            "format": "int"
-          }
-        ],
-        "opt": []
-      }
+      "form": [
+        {
+          "type": "aff",
+          "id": "aff",
+          "format": null,
+          "required": true
+        },
+        {
+          "type": "half",
+          "id": "offset",
+          "format": ["positive", "int"],
+          "required": false
+        }
+      ]
     },
     {
-      "name": "谱面镜像工具",
       "type": "chart",
       "id": "chart-mirror",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "谱面对齐工具",
       "type": "chart",
       "id": "chart-align",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "切蛇工具",
       "type": "arc",
       "id": "arc-cutter",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "时间点切蛇工具",
       "type": "arc",
       "id": "arc-splitbytiming",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "下雨Arc生成",
       "type": "arc",
       "id": "arc-rain",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "折线Arc生成",
       "type": "arc",
       "id": "arc-crease-line",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "帧动画辅助",
       "type": "arc",
       "id": "arc-animate",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "Arc包络",
       "type": "arc",
       "id": "arc-envelope",
       "new": true,
-      "form": {
-        "main": [],
-        "opt": []
-      }
+      "form": []
     },
     {
-      "name": "Timing缓动",
       "type": "timing",
       "id": "timing-easing",
-      "new": true
+      "new": true,
+      "form":[]
     },
     {
-      "name": "抽动Timing",
       "type": "timing",
       "id": "timing-glitch",
-      "new": false
+      "new": false,
+      "form":[]
     },
     {
-      "name": "卡顿Timing",
       "type": "timing",
       "id": "timing-stuck",
-      "new": true
+      "new": true,
+      "form":[]
     },
     {
-      "name": "测试页面",
       "type": "",
       "id": "test",
       "new": false,
-      "form": {
-        "main": [
-          {
-            "input": "large",
-            "id": "aff",
-            "name": "完整谱面或谱面片段"
-          },
-          {
-            "input": "half",
-            "id": "offset",
-            "name": "偏移量",
-            "helper": "单位为ms",
-            "format": "int"
-          }
-        ],
-        "opt": []
-      }
+      "form": []
     }
   ],
-  "category": [
-    {
-      "id": "new",
-      "name": "最新"
-    },
-    {
-      "id": "chart",
-      "name": "谱面工具"
-    },
-    {
-      "id": "arc",
-      "name": "Arc工具"
-    },
-    {
-      "id": "timing",
-      "name": "Timing工具"
-    }
-  ]
+  "category": ["new", "chart", "arc", "timing"]
 }

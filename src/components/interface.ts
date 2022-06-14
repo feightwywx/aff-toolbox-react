@@ -1,21 +1,17 @@
 export interface ToolListItemData {
-  name: string,
   new: boolean,
   type: string,
   id: string
-  form: {
-    main: Array<FormData>,
-    opt: Array<FormData>
-  }
+  form: Array<FormData>
 }
 
-export interface ToolCategoryData {
-  id: string,
-  name: string
-}
+export type ToolCategoryData = Array<string>
+
+export type FormatOption = 'withArcTap' | 'positive' | 'nonNegative' | 'int' | 'float'
 
 export interface FormData {
+  type: 'aff' | 'arc' | 'number' | 'bezier' | 'easing',
   id: string,
-  input: string,
-  format?: string
+  format?: Array<FormatOption>,
+  required: boolean
 }

@@ -1,11 +1,11 @@
 import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
+import { FormData, ToolListItemData } from './interface';
+import { Formik, useFormik } from 'formik';
 import { Trans, useTranslation } from 'react-i18next'
 
-import { FormData } from './interface';
 import { PlayArrow } from '@mui/icons-material';
 import React from "react"
 import { graphql } from "gatsby"
-import { useFormik } from 'formik';
 import { useTheme } from '@mui/material/styles';
 
 export default function toolPage({ data }) {
@@ -14,18 +14,16 @@ export default function toolPage({ data }) {
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
 
   console.log(data);
-  const pageContext = data['allSitePage']['nodes'][0]['pageContext']
+  const pageContext: ToolListItemData = data['allSitePage']['nodes'][0]['pageContext']
   const pageId = pageContext['id']
-  const pageName = pageContext['name']
-  const pageForm = pageContext['form']
-
+  const pageForm: Array<FormData> = pageContext['form']
+  console.log(pageForm)
+  // 读取表单结构
   let formikInitValues = {}
-  if (pageForm && 'main' in pageForm) {
-    (pageForm.main).map(x => formikInitValues = { ...formikInitValues , [x.id]: ''})
+  if (pageForm) {
+    (pageForm).map((x: FormData) => formikInitValues = { ...formikInitValues, [x.id]: '' })
   }
-  if (pageForm && 'opt' in pageForm) {
-    (pageForm.main).map(x => formikInitValues = { ...formikInitValues , [x.id]: '' })
-  }
+  
   console.log(pageForm);
   const formik = useFormik({
     initialValues: formikInitValues,
@@ -37,12 +35,13 @@ export default function toolPage({ data }) {
 
   return (
     <Box>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant={isDesktop ? 'h2' : 'h3'}><Trans>{pageId}.name</Trans></Typography>
+        <Typography variant="h6"><Trans>{pageId}.shortDesc</Trans></Typography>
+      </Box>
       <form onSubmit={formik.handleSubmit}>
         <Stack spacing={2} sx={{ mb: 2 }}>
-          <Box>
-            <Typography variant={isDesktop ? 'h2' : 'h3'}><Trans>{pageId}.name</Trans></Typography>
-            <Typography variant="h6"><Trans>{pageId}.shortDesc</Trans></Typography>
-          </Box>
+          {/* 主要部分 */}
           <Card>
             <CardContent>
               <Grid container spacing={2}>

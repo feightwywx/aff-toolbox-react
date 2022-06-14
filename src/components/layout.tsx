@@ -68,22 +68,18 @@ export default function Layout({ children }) {
       edges {
         node {
           toolList {
-            name
             new
             id
             type
           }
-          category {
-            id
-            name
-          }
+          category
         }
       }
     }
   }`)['allConfigJson']['edges'][0]['node']
 
   const toolListData = toolData['toolList'] as Array<ToolListItemData>
-  const categoryData = toolData['category'] as Array<ToolCategoryData>
+  const categoryData = toolData['category'] as ToolCategoryData
 
   // 样式
   const theme = createTheme(
@@ -179,6 +175,7 @@ export default function Layout({ children }) {
     m: 0.5,
     ml: 1,
     mr: 1,
+    // TODO 考虑覆盖ripple颜色的同时保持动画
     // 可以hack掉ripple颜色 但是会导致动画出现问题
     // [`& .MuiTouchRipple-root span`]: {
     //  backgroundColor: theme.palette.primary.main
@@ -216,6 +213,7 @@ export default function Layout({ children }) {
   });
 
   // FIXME 直接进入一个子页面时，Collapse状态不正确
+  // FIXME 语言不是默认时，路由会刷新页面
   const drawerContent = (
     <Box sx={{ p: 1 }}>
       <Box sx={{ overflow: 'auto' }}>
@@ -227,21 +225,21 @@ export default function Layout({ children }) {
                       }} />
             </ListItemButton>
           </Box>
-          {categoryData.map((cdata, index) => (
-            <Box key={cdata.id}>
-              <ListItemButton onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [cdata.id]: !drawerCollapseState[cdata.id] }) }}>
-                <ListItemText primary={t(`${cdata.id}.name`)} />
-                {drawerCollapseState[cdata.id] ? <ExpandLess /> : <ExpandMore />}
+          {categoryData.map((cid, index) => (
+            <Box key={cid}>
+              <ListItemButton onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [cid]: !drawerCollapseState[cid] }) }}>
+                <ListItemText primary={t(`${cid}.name`)} />
+                {drawerCollapseState[cid] ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
-              <Collapse in={drawerCollapseState[cdata.id]} timeout="auto" unmountOnExit>
+              <Collapse in={drawerCollapseState[cid]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
-                  {toolListData.filter((data) => (((cdata.id) === 'new') ? data.new : (data.type === cdata.id))).map((data, index) => (
+                  {toolListData.filter((data) => (((cid) === 'new') ? data.new : (data.type === cid))).map((data, index) => (
                     <ListItemButton
                     LinkComponent={I18Link} 
                     key={index} 
                     sx={ListItemSx} 
                     to={`/${data.id}`} 
-                    selected={`/${data.id}` === currentPage && cdata.id !== 'new'} 
+                    selected={`/${data.id}` === currentPage && cid !== 'new'} 
                     onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
                       <ListItemText primary={t(`${data.id}.name`)} sx={{
                         color: theme.palette.text.primary,

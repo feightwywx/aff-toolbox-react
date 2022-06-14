@@ -5,22 +5,19 @@ exports.createPages = async function ({ actions, graphql }) {
       nodes {
         toolList {
           form {
-            main {
-              format
-              helper
-              id
-              input
-              name
-            }
+            type
+            id
+            format
+            required
           }
           id
-          name
         }
       }
     }
   }
     `)
-    console.log(data['allConfigJson']['edges']);
+  // console.log(data['allConfigJson']['edges']);
+  console.log(data);
   data['allConfigJson']['nodes'][0]['toolList'].forEach(tool => {
     actions.createPage({
       path: '/' + tool.id,
@@ -28,7 +25,6 @@ exports.createPages = async function ({ actions, graphql }) {
       context: {
         id: tool.id,
         pagePath: '/' + tool.id,
-        name: tool.name,
         form: tool.form
       }
     })
