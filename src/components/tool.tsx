@@ -1,6 +1,9 @@
+import * as Yup from 'yup'
+
+import { AffTextField, NumberField } from './input';
 import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
+import { Form, Formik, useFormik } from 'formik';
 import { FormData, ToolListItemData } from './interface';
-import { Formik, useFormik } from 'formik';
 import { Trans, useTranslation } from 'react-i18next'
 
 import { PlayArrow } from '@mui/icons-material';
@@ -10,28 +13,43 @@ import { useTheme } from '@mui/material/styles';
 
 export default function toolPage({ data }) {
   const theme = useTheme();
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
 
-  console.log(data);
-  const pageContext: ToolListItemData = data['allSitePage']['nodes'][0]['pageContext']
-  const pageId = pageContext['id']
-  const pageForm: Array<FormData> = pageContext['form']
-  console.log(pageForm)
+  // console.log(data);
+  const pageContext: ToolListItemData = data['allSitePage']['nodes'][0]['pageContext'];
+  const pageId = pageContext['id'];
+  const pageForm: Array<FormData> = pageContext['form'];
+  // console.log(pageForm);
   // 读取表单结构
-  let formikInitValues = {}
+  let formikInitValues = {};
+  let validationSchema = {};
   if (pageForm) {
-    (pageForm).map((x: FormData) => formikInitValues = { ...formikInitValues, [x.id]: '' })
-  }
-  
-  console.log(pageForm);
-  const formik = useFormik({
-    initialValues: formikInitValues,
-    onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  })
+    (pageForm).map((x: FormData) => {
+      formikInitValues = { ...formikInitValues, [x.id]: '' }
 
+      if (x.type === 'number') {
+        validationSchema[x.id] = Yup.number().typeError('请输入一个数值')
+        // console.log(validationSchema[x.id]);
+        if (x.format && 'int' in x.format) {
+          validationSchema[x.id] = validationSchema[x.id].integer('值不能为小数');
+        }
+
+        if (x.format && 'nonNegative' in x.format) {
+          validationSchema[x.id] = validationSchema[x.id].min(0, '值不能为负数');
+        }
+
+      } else if (x.type === 'aff') {
+        validationSchema[x.id] = Yup.string()
+      } else {
+        console.warn(`[AFF Toolbox] 表单生成工具未生成以下验证：不支持${x.type}类型\n页面ID：${pageId}\n控件声明：\n${JSON.stringify(x, null, 2)}`);
+      }
+
+      if (x.required) {
+        validationSchema[x.id] = validationSchema[x.id].required('不能为空');
+      }
+    })
+  }
 
   return (
     <Box>
@@ -39,54 +57,60 @@ export default function toolPage({ data }) {
         <Typography variant={isDesktop ? 'h2' : 'h3'}><Trans>{pageId}.name</Trans></Typography>
         <Typography variant="h6"><Trans>{pageId}.shortDesc</Trans></Typography>
       </Box>
-      <form onSubmit={formik.handleSubmit}>
-        <Stack spacing={2} sx={{ mb: 2 }}>
-          {/* 主要部分 */}
-          <Card>
-            <CardContent>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    id="aff"
-                    name="aff"
-                    label="AFF谱面"
-                    onChange={formik.handleChange}
-                    value={formik.values['aff']}
-                    multiline
-                    fullWidth
-                    rows={10}
-                    helperText='支持完整AFF或谱面片段'
-                    placeholder={`AudioOffset:248\n-\ntiming(0,222.22,4.00);\n...`}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="offset"
-                    name="offset"
-                    label="谱面延迟"
-                    onChange={formik.handleChange}
-                    value={formik.values['offset']}
-                    helperText='延迟量（ms）'
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Stack>
-        <Fab variant="extended" type='submit' color='secondary' sx={{
-          boxShadow: 2,
-          zIndex: 'tooltip',
-          position: 'fixed',
-          bottom: (theme) => theme.spacing(4),
-          right: (theme) => theme.spacing(4)
+      <Formik
+        initialValues={formikInitValues}
+        validationSchema={Yup.object(validationSchema)}
+        onSubmit={values => {
+          alert(JSON.stringify(values, null, 2));
         }}>
-          <PlayArrow sx={{ mr: 1 }} />
-          生成并复制
-        </Fab>
-      </form>
+        <Form>
+          <Stack spacing={2} sx={{ mb: 2 }}>
+            {/* 主要部分 */}
+            <Card>
+              <CardContent>
+                <Grid container spacing={2}>
+                  {pageForm.map((x: FormData) => {
+                    if (x.type === 'aff') {
+                      return (
+                        <Grid key={x.id} item xs={12}>
+                          <AffTextField
+                            name={x.id}
+                            id={x.id}
+                            type='text'
+                          />
+                        </Grid>
+                      )
+                    } else if (x.type === 'number'){
+                      return (
+                        <Grid key={x.id} item xs={12} sm={6} md={4}>
+                          <NumberField
+                            name={x.id}
+                            id={x.id}
+                            type='text'
+                          />
+                        </Grid>
+                      )
+                    } else {
+                      console.warn(`[AFF Toolbox] 表单生成工具未生成以下控件：不支持${x.type}类型\n页面ID：${pageId}\n控件声明：\n${JSON.stringify(x, null, 2)}`);
+                    }
+                  })}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Stack>
+          <Fab variant="extended" type='submit' color='secondary' sx={{
+            boxShadow: 2,
+            zIndex: 'tooltip',
+            position: 'fixed',
+            bottom: (theme) => theme.spacing(4),
+            right: (theme) => theme.spacing(4)
+          }}
+          >
+            <PlayArrow sx={{ mr: 1 }} />
+            生成并复制
+          </Fab>
+        </Form>
+      </Formik>
     </Box>
   );
 }

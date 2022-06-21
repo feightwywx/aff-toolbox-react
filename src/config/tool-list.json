@@ -12,10 +12,10 @@
           "required": true
         },
         {
-          "type": "half",
+          "type": "number",
           "id": "offset",
-          "format": ["positive", "int"],
-          "required": false
+          "format": ["nonNegative", "int"],
+          "required": true
         }
       ]
     },
