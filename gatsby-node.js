@@ -16,8 +16,6 @@ exports.createPages = async function ({ actions, graphql }) {
     }
   }
     `)
-  // console.log(data['allConfigJson']['edges']);
-  // console.log(data);
   data['allConfigJson']['nodes'][0]['toolList'].forEach(tool => {
     actions.createPage({
       path: '/' + tool.id,

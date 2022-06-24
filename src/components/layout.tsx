@@ -21,7 +21,7 @@ import {
 } from 'gatsby-theme-material-ui';
 import { Link as I18Link, useI18next } from 'gatsby-plugin-react-i18next';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
-import { ToolCategoryData, ToolListItemData } from './interface'
+import { ToolCategoryData, ToolListItemData } from '../interface'
 import { graphql, useStaticQuery } from 'gatsby'
 
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -33,6 +33,7 @@ import React from "react"
 import TranslateIcon from '@mui/icons-material/Translate';
 import { useLocation } from '@reach/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { version } from '../config/version';
 
 const drawerWidth = 240;
 
@@ -60,7 +61,6 @@ export default function Layout({ children }) {
   const location = useLocation();
   const pathName = location.pathname.split('\\')
   const currentPage = pathName[pathName.length - 1]
-  console.log(currentPage)
   const { languages, originalPath, t, i18n } = useI18next();
 
   const toolData = useStaticQuery(graphql`query ToolListQuery {
@@ -183,7 +183,6 @@ export default function Layout({ children }) {
   }
 
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-  console.log(`Desktop: ${isDesktop}`)
   // 菜单
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [langAnchorEl, setLangAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -220,9 +219,9 @@ export default function Layout({ children }) {
         <List dense>
           <Box>
             <ListItemButton sx={ListItemSx} to='/' selected={location.pathname === '/'}>
-            <ListItemText primary={t('home')} sx={{
-                        color: theme.palette.text.primary,
-                      }} />
+              <ListItemText primary={t('home')} sx={{
+                color: theme.palette.text.primary,
+              }} />
             </ListItemButton>
           </Box>
           {categoryData.map((cid, index) => (
@@ -235,12 +234,12 @@ export default function Layout({ children }) {
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
                   {toolListData.filter((data) => (((cid) === 'new') ? data.new : (data.type === cid))).map((data, index) => (
                     <ListItemButton
-                    LinkComponent={I18Link} 
-                    key={index} 
-                    sx={ListItemSx} 
-                    to={`/${data.id}`} 
-                    selected={`/${data.id}` === currentPage && cid !== 'new'} 
-                    onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
+                      LinkComponent={I18Link}
+                      key={index}
+                      sx={ListItemSx}
+                      to={`/${data.id}`}
+                      selected={`/${data.id}` === currentPage && cid !== 'new'}
+                      onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
                       <ListItemText primary={t(`${data.id}.name`)} sx={{
                         color: theme.palette.text.primary,
                       }} />
@@ -254,6 +253,13 @@ export default function Layout({ children }) {
       </Box>
     </Box>
   )
+
+  React.useEffect(() => {
+    console.log(`%cAFF Toolbox%c${version}%c\nBuild with React and Love\nHave a nice day :)`,
+    'background: #e0d6f5; color: #59446f; padding: 2px',
+    'background: #59446f; color: #fff; padding: 2px',
+    'background: #fff; color: #000; margin-top: 2px')
+  }, [])
 
   return (
     <Box>
@@ -298,7 +304,7 @@ export default function Layout({ children }) {
                   </Typography>
                 </Badge>
               </Box>
-              
+
               <IconButton
                 size="large"
                 aria-label="language"
@@ -327,7 +333,7 @@ export default function Layout({ children }) {
                 <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='zh'>中文</MenuItem>
                 <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='en'>English</MenuItem>
               </Menu>
-              
+
               <IconButton
                 size="large"
                 aria-label="menu"

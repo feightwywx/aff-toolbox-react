@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 import { AffTextField, NumberField } from './input';
 import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
 import { Form, Formik, useFormik } from 'formik';
-import { FormData, ToolListItemData } from './interface';
+import { FormData, ToolListItemData } from '../interface';
 import { Trans, useTranslation } from 'react-i18next'
 
 import { PlayArrow } from '@mui/icons-material';
@@ -16,11 +16,9 @@ export default function toolPage({ data }) {
   const { t } = useTranslation();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
 
-  // console.log(data);
   const pageContext: ToolListItemData = data['allSitePage']['nodes'][0]['pageContext'];
   const pageId = pageContext['id'];
   const pageForm: Array<FormData> = pageContext['form'];
-  // console.log(pageForm);
   // 读取表单结构
   let formikInitValues = {};
   let validationSchema = {};
@@ -30,7 +28,6 @@ export default function toolPage({ data }) {
 
       if (x.type === 'number') {
         validationSchema[x.id] = Yup.number().typeError('请输入一个数值')
-        // console.log(validationSchema[x.id]);
         if (x.format && 'int' in x.format) {
           validationSchema[x.id] = validationSchema[x.id].integer('值不能为小数');
         }
@@ -61,7 +58,11 @@ export default function toolPage({ data }) {
         initialValues={formikInitValues}
         validationSchema={Yup.object(validationSchema)}
         onSubmit={values => {
-          alert(JSON.stringify(values, null, 2));
+          if (navigator.clipboard !== undefined) {
+            navigator.clipboard.writeText(JSON.stringify(values, null, 2));
+          } else {
+            console.warn('[AFF Toolbox] 无法访问剪贴板，这可能是因为浏览器过旧或页面不来自一个安全的来源。')
+          }
         }}>
         <Form>
           <Stack spacing={2} sx={{ mb: 2 }}>
@@ -80,7 +81,7 @@ export default function toolPage({ data }) {
                           />
                         </Grid>
                       )
-                    } else if (x.type === 'number'){
+                    } else if (x.type === 'number') {
                       return (
                         <Grid key={x.id} item xs={12} sm={6} md={4}>
                           <NumberField

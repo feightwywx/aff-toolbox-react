@@ -9,7 +9,6 @@ export const AffTextField = ({ ...props }) => {
   const { t } = useTranslation();
 
   let isError = Boolean(meta.touched && meta.error)
-  console.log(props.id,meta)
 
   return (
     <TextField {...field} {...props}
@@ -29,7 +28,6 @@ export const NumberField = ({ ...props }) => {
   const { t } = useTranslation();
 
   let isError = Boolean(meta.touched && meta.error)
-  console.log(props.id,meta)
 
   return (
     <TextField {...field} {...props}
