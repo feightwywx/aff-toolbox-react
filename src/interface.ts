@@ -17,5 +17,7 @@ export interface FormData {
 }
 
 export interface HistoryItemData {
-  value: string
+  value: string,
+  tool: string,
+  time: number
 }

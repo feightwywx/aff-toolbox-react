@@ -11,6 +11,7 @@ import React from "react"
 import { graphql } from "gatsby"
 import { useSnackbar } from 'notistack';
 import { useTheme } from '@mui/material/styles';
+import { HistoryContext } from './history';
 
 export default function toolPage({ data }) {
   const theme = useTheme();
@@ -49,7 +50,9 @@ export default function toolPage({ data }) {
     })
   }
 
-  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const {history, setHistory} = React.useContext(HistoryContext)
 
   return (
     <Box>
@@ -63,9 +66,17 @@ export default function toolPage({ data }) {
         onSubmit={values => {
           if (navigator.clipboard !== undefined) {
             navigator.clipboard.writeText(JSON.stringify(values, null, 2));
+            if (history !== null) {
+              setHistory([{
+                value: JSON.stringify(values, null, 2),
+                tool: pageId,
+                time: Date.now()
+              }, ...history])
+            }
+
             enqueueSnackbar("生成结果已复制到剪贴板", { variant: 'success' });
           } else {
-            console.warn('[AFF Toolbox] 无法访问剪贴板，这可能是因为浏览器过旧或页面不来自一个安全的来源。')
+            console.warn('[AFF Toolbox] 无法访问剪贴板，这可能是因为权限不足，浏览器过旧或页面不来自一个安全的来源。')
             enqueueSnackbar("结果已生成，但是复制失败。请检查历史记录面板。", { variant: 'warning' });
           }
         }}>

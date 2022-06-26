@@ -23,7 +23,7 @@ import {
 } from 'gatsby-theme-material-ui';
 import { Link as I18Link, useI18next } from 'gatsby-plugin-react-i18next';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
-import { ToolCategoryData, ToolListItemData } from '../interface'
+import { HistoryItemData, ToolCategoryData, ToolListItemData } from '../interface'
 import { graphql, useStaticQuery } from 'gatsby'
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -210,7 +210,8 @@ export default function Layout({ children }) {
 
   // 历史记录
   const [historyDialogOpen, setHistoryDialog] = React.useState(false);
-  const history = React.useContext(HistoryContext);
+  const [history, setHistory] = React.useState([] as Array<HistoryItemData>)
+  
 
   // 抽屉
   const [drawerOpen, setDrawerOpen] = React.useState(true);
@@ -289,7 +290,7 @@ export default function Layout({ children }) {
           anchorOrigin={isDesktop ? { vertical: 'bottom', horizontal: 'left' } : { vertical: 'top', horizontal: 'center' }}
           TransitionComponent={Fade}
         >
-          <HistoryContext.Provider value={{}}>
+          <HistoryContext.Provider value={{history, setHistory}}>
             <CssBaseline />
             <Box sx={{ display: 'flex' }}>
               {/* appbar */}
@@ -483,9 +484,7 @@ export default function Layout({ children }) {
                     <CloseIcon />
                   </IconButton>
                 </DialogTitle>
-                <DialogContent sx={{ minHeight: '70vh' }}>
-
-                </DialogContent>
+                <HistoryDialogContent value={history}/>
               </Dialog>
             </Box>
           </HistoryContext.Provider>
