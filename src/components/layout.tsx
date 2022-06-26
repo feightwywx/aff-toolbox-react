@@ -5,7 +5,9 @@ import {
   Collapse,
   Container,
   CssBaseline,
+  Dialog,
   Drawer,
+  Fade,
   List,
   ListItemText,
   Menu,
@@ -24,12 +26,18 @@ import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { ToolCategoryData, ToolListItemData } from '../interface'
 import { graphql, useStaticQuery } from 'gatsby'
 
+import CloseIcon from '@mui/icons-material/Close';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Helmet } from 'react-helmet';
+import { HistoryContext, HistoryDialogContent } from './history';
+import HistoryIcon from '@mui/icons-material/History';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import React from "react"
+import { SnackbarProvider } from 'notistack';
 import TranslateIcon from '@mui/icons-material/Translate';
 import { useLocation } from '@reach/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -113,7 +121,10 @@ export default function Layout({ children }) {
         MuiPaper: {
           styleOverrides: {
             root: {
-              borderRadius: 12
+              borderRadius: 12,
+              MuiDialog: {
+                borderRadius: 24
+              }
             }
           }
         },
@@ -197,6 +208,10 @@ export default function Layout({ children }) {
     setLangAnchorEl(null);
   };
 
+  // 历史记录
+  const [historyDialogOpen, setHistoryDialog] = React.useState(false);
+  const history = React.useContext(HistoryContext);
+
   // 抽屉
   const [drawerOpen, setDrawerOpen] = React.useState(true);
   const handleDrawer = () => {
@@ -256,9 +271,9 @@ export default function Layout({ children }) {
 
   React.useEffect(() => {
     console.log(`%cAFF Toolbox%c${version}%c\nBuild with React and Love\nHave a nice day :)`,
-    'background: #e0d6f5; color: #59446f; padding: 2px',
-    'background: #59446f; color: #fff; padding: 2px',
-    'background: #fff; color: #000; margin-top: 2px')
+      'background: #e0d6f5; color: #59446f; padding: 2px',
+      'background: #59446f; color: #fff; padding: 2px',
+      'background: #fff; color: #000; margin-top: 2px')
   }, [])
 
   return (
@@ -268,166 +283,213 @@ export default function Layout({ children }) {
         <link href="https://fonts.font.im/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
       </Helmet>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box sx={{ display: 'flex' }}>
-          <AppBar
-            position="fixed"
-            sx={{
-              zIndex: (theme) => theme.zIndex.drawer + 1,
-              borderRadius: 0,
-              backgroundColor: theme.palette.primary.light,
-            }}
-            elevation={0}
-          >
-            <Toolbar sx={{
-              backgroundColor: theme.palette.primary.light,
-              color: theme.palette.primary.dark,
-              borderBottomStyle: 'none',
-              borderBottomColor: theme.palette.divider,
-              borderBottomWidth: '1px'
-            }}
-            >
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                sx={{ mr: 2 }}
-                onClick={handleDrawer}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Box sx={{ flexGrow: 1 }}>
-                <Badge badgeContent={'beta'} color="secondary">
-                  <Typography variant="h6" component="div" sx={{ pr: 2 }}>
-                    AFF工具箱
-                  </Typography>
-                </Badge>
-              </Box>
-
-              <IconButton
-                size="large"
-                aria-label="language"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleLangMenu}
-                color="inherit"
-              >
-                <TranslateIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={langAnchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(langAnchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='zh'>中文</MenuItem>
-                <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='en'>English</MenuItem>
-              </Menu>
-
-              <IconButton
-                size="large"
-                aria-label="menu"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <MoreIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose} sx={MenuItemSx}>Arc构造工具</MenuItem>
-                <MenuItem onClick={handleClose} sx={MenuItemSx}>时间细分计算器</MenuItem>
-              </Menu>
-            </Toolbar>
-          </AppBar>
-          {
-            isDesktop ? (
-              <Drawer
-                variant="persistent"
+        <SnackbarProvider
+          maxSnack={isDesktop ? 3 : 1}
+          style={isDesktop ? {} : { marginTop: '48px' }}
+          anchorOrigin={isDesktop ? { vertical: 'bottom', horizontal: 'left' } : { vertical: 'top', horizontal: 'center' }}
+          TransitionComponent={Fade}
+        >
+          <HistoryContext.Provider value={{}}>
+            <CssBaseline />
+            <Box sx={{ display: 'flex' }}>
+              {/* appbar */}
+              <AppBar
+                position="fixed"
                 sx={{
-                  width: drawerWidth,
-                  flexShrink: 0,
-                  [`& .MuiDrawer-paper`]: {
-                    width: drawerWidth,
-                    boxSizing: 'border-box',
-                    borderRightColor: theme.palette.divider,
-                    backgroundColor: theme.palette.background.default,
-                    borderRadius: 0
-                  },
+                  zIndex: (theme) => theme.zIndex.drawer + 1,
+                  borderRadius: 0,
+                  backgroundColor: theme.palette.primary.light,
                 }}
-                anchor="left"
-                open={drawerOpen}
+                elevation={0}
               >
-                <Toolbar sx={{ mb: 1 }} />
-                {drawerContent}
-              </Drawer>
-            ) : (  // mobile
-              <Box>
-                <Drawer
-                  variant="temporary"
-                  open={!drawerOpen}  // 移动端的drawer默认逻辑和桌面端相反
-                  onClose={handleDrawer}
-                  ModalProps={{
-                    keepMounted: true, // Better open performance on mobile.
-                  }}
-                  sx={{
-                    '& .MuiDrawer-paper': {
-                      boxSizing: 'border-box',
-                      width: drawerWidth,
-                      mt: { 'xs': 9, 'sm': 10 },
-                      ml: 2,
-                      height: '70%',
-                      borderRadius: 4
-                    },
-                  }}
-                  elevation={8}
+                <Toolbar sx={{
+                  backgroundColor: theme.palette.primary.light,
+                  color: theme.palette.primary.dark,
+                  borderBottomStyle: 'none',
+                  borderBottomColor: theme.palette.divider,
+                  borderBottomWidth: '1px'
+                }}
                 >
-                  {drawerContent}
-                </Drawer>
-              </Box>
-            )
-          }
-          {
-            isDesktop ? (
-              <Main open={drawerOpen}>
-                <Container>
-                  <Toolbar />
-                  {children}
-                </Container>
-              </Main>
-            ) : (
-              <Container>
-                <Toolbar sx={{ mt: 2 }} />
-                {children}
-              </Container>
-            )
-          }
+                  <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="menu"
+                    sx={{ mr: 2 }}
+                    onClick={handleDrawer}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Badge badgeContent={'beta'} color="secondary">
+                      <Typography variant="h6" component="div" sx={{ pr: 2 }}>
+                        AFF工具箱
+                      </Typography>
+                    </Badge>
+                  </Box>
+                  <IconButton
+                    size="large"
+                    aria-label="language"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={() => setHistoryDialog(true)}
+                    color="inherit"
+                  >
+                    <HistoryIcon />
+                  </IconButton>
+                  <IconButton
+                    size="large"
+                    aria-label="language"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleLangMenu}
+                    color="inherit"
+                  >
+                    <TranslateIcon />
+                  </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={langAnchorEl}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(langAnchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='zh'>中文</MenuItem>
+                    <MenuItem onClick={handleClose} sx={MenuItemSx} component={I18Link} to={originalPath} language='en'>English</MenuItem>
+                  </Menu>
 
-        </Box>
+                  <IconButton
+                    size="large"
+                    aria-label="menu"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleMenu}
+                    color="inherit"
+                  >
+                    <MoreIcon />
+                  </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleClose} sx={MenuItemSx}>Arc构造工具</MenuItem>
+                    <MenuItem onClick={handleClose} sx={MenuItemSx}>时间细分计算器</MenuItem>
+                  </Menu>
+                </Toolbar>
+              </AppBar>
+
+              {/* drawer */}
+              {
+                isDesktop ? (
+                  <Drawer
+                    variant="persistent"
+                    sx={{
+                      width: drawerWidth,
+                      flexShrink: 0,
+                      [`& .MuiDrawer-paper`]: {
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        borderRightColor: theme.palette.divider,
+                        backgroundColor: theme.palette.background.default,
+                        borderRadius: 0
+                      },
+                    }}
+                    anchor="left"
+                    open={drawerOpen}
+                  >
+                    <Toolbar sx={{ mb: 1 }} />
+                    {drawerContent}
+                  </Drawer>
+                ) : (  // mobile
+                  <Box>
+                    <Drawer
+                      variant="temporary"
+                      open={!drawerOpen}  // 移动端的drawer默认逻辑和桌面端相反
+                      onClose={handleDrawer}
+                      ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                      }}
+                      sx={{
+                        '& .MuiDrawer-paper': {
+                          boxSizing: 'border-box',
+                          width: drawerWidth,
+                          mt: { 'xs': 9, 'sm': 10 },
+                          ml: 2,
+                          height: '70%',
+                          borderRadius: 4
+                        },
+                      }}
+                      elevation={8}
+                    >
+                      {drawerContent}
+                    </Drawer>
+                  </Box>
+                )
+              }
+
+              {/* 模板嵌入区域 */}
+              {
+                isDesktop ? (
+                  <Main open={drawerOpen}>
+                    <Container>
+                      <Toolbar />
+                      {children}
+                    </Container>
+                  </Main>
+                ) : (
+                  <Container>
+                    <Toolbar sx={{ mt: 2 }} />
+                    {children}
+                  </Container>
+                )
+              }
+
+              {/* 历史记录面板 */}
+              <Dialog open={historyDialogOpen} onClose={() => { setHistoryDialog(false) }} fullWidth maxWidth={'lg'}
+              sx={{ zIndex: 'modal', 
+              '& .MuiDialog-paper': {
+                borderRadius: '24px'
+              }}}>
+                <DialogTitle>
+                  历史记录
+                  <IconButton
+                    onClick={() => { setHistoryDialog(false) }}
+                    sx={{
+                      position: 'absolute',
+                      right: 12,
+                      top: 12,
+                      color: (theme) => theme.palette.primary.dark,
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ minHeight: '70vh' }}>
+
+                </DialogContent>
+              </Dialog>
+            </Box>
+          </HistoryContext.Provider>
+        </SnackbarProvider>
       </ThemeProvider>
     </Box>
   )

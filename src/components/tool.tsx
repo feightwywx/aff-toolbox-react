@@ -9,6 +9,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { PlayArrow } from '@mui/icons-material';
 import React from "react"
 import { graphql } from "gatsby"
+import { useSnackbar } from 'notistack';
 import { useTheme } from '@mui/material/styles';
 
 export default function toolPage({ data }) {
@@ -48,6 +49,8 @@ export default function toolPage({ data }) {
     })
   }
 
+  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+
   return (
     <Box>
       <Box sx={{ mb: 2 }}>
@@ -60,8 +63,10 @@ export default function toolPage({ data }) {
         onSubmit={values => {
           if (navigator.clipboard !== undefined) {
             navigator.clipboard.writeText(JSON.stringify(values, null, 2));
+            enqueueSnackbar("生成结果已复制到剪贴板", { variant: 'success' });
           } else {
             console.warn('[AFF Toolbox] 无法访问剪贴板，这可能是因为浏览器过旧或页面不来自一个安全的来源。')
+            enqueueSnackbar("结果已生成，但是复制失败。请检查历史记录面板。", { variant: 'warning' });
           }
         }}>
         <Form>
@@ -101,7 +106,6 @@ export default function toolPage({ data }) {
           </Stack>
           <Fab variant="extended" type='submit' color='secondary' sx={{
             boxShadow: 2,
-            zIndex: 'tooltip',
             position: 'fixed',
             bottom: (theme) => theme.spacing(4),
             right: (theme) => theme.spacing(4)

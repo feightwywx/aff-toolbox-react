@@ -15,3 +15,7 @@ export interface FormData {
   format?: Array<FormatOption>,
   required: boolean
 }
+
+export interface HistoryItemData {
+  value: string
+}
