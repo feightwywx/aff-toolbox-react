@@ -14,14 +14,14 @@ export const createPages: GatsbyNode["createPages"] = async function ({ actions,
     }
   }
   `) as {[x: string]: any};
-  data['allFile']['edges'].forEach(edge => {
+  data['allFile']['edges'].forEach((edge: { [x: string]: { [x: string]: any; }; }) => {
     let modulePath = edge['node']['relativePath'];
     let mod = require(path.resolve(`./src/modules/${modulePath}`)) as ArcToolModule;
-    mod['pagePath'] = `/${mod.id}`
+    let context = {pagePath: `/${mod.id}`, ...mod}
     actions.createPage({
       path: '/' + mod.id,
       component: path.resolve(`./src/components/tool.tsx`),
-      context: mod
+      context: context
     })
   })
 }
