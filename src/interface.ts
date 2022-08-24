@@ -1,7 +1,7 @@
 export interface ToolListItemData {
   new: boolean,
   type: string,
-  id: string
+  id: string,
   form: Array<FormData>
 }
 
@@ -14,6 +14,18 @@ export interface FormData {
   id: string,
   format?: Array<FormatOption>,
   required: boolean
+}
+
+export interface ArcToolModule {
+  id: string,
+  type: string,
+  form: Array<FormData>
+  implement?: (input: Object) => ArcToolResult
+}
+
+export interface ArcToolResult {
+  code: number,
+  result: string
 }
 
 export interface HistoryItemData {

@@ -21,9 +21,10 @@ import {
   Link,
   ListItemButton
 } from 'gatsby-theme-material-ui';
+import { HistoryContext, HistoryDialogContent } from './history';
+import { HistoryItemData, ToolCategoryData, ToolListItemData } from '../interface'
 import { Link as I18Link, useI18next } from 'gatsby-plugin-react-i18next';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
-import { HistoryItemData, ToolCategoryData, ToolListItemData } from '../interface'
 import { graphql, useStaticQuery } from 'gatsby'
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -32,7 +33,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Helmet } from 'react-helmet';
-import { HistoryContext, HistoryDialogContent } from './history';
 import HistoryIcon from '@mui/icons-material/History';
 import MenuIcon from '@mui/icons-material/Menu';
 import MoreIcon from '@mui/icons-material/MoreVert';
@@ -211,7 +211,7 @@ export default function Layout({ children }) {
   // 历史记录
   const [historyDialogOpen, setHistoryDialog] = React.useState(false);
   const [history, setHistory] = React.useState([] as Array<HistoryItemData>)
-  
+
 
   // 抽屉
   const [drawerOpen, setDrawerOpen] = React.useState(true);
@@ -271,10 +271,11 @@ export default function Layout({ children }) {
   )
 
   React.useEffect(() => {
-    console.log(`%cAFF Toolbox%c${version}%c\nBuild with React and Love\nHave a nice day :)`,
+    console.log(`%cAFF Toolbox%c${version}%c\nBuild with React and Love :)`,
       'background: #e0d6f5; color: #59446f; padding: 2px',
       'background: #59446f; color: #fff; padding: 2px',
-      'background: #fff; color: #000; margin-top: 2px')
+      'background: #fff; color: #000; margin-top: 2px');
+
   }, [])
 
   return (
@@ -290,7 +291,7 @@ export default function Layout({ children }) {
           anchorOrigin={isDesktop ? { vertical: 'bottom', horizontal: 'left' } : { vertical: 'top', horizontal: 'center' }}
           TransitionComponent={Fade}
         >
-          <HistoryContext.Provider value={{history, setHistory}}>
+          <HistoryContext.Provider value={{ history, setHistory }}>
             <CssBaseline />
             <Box sx={{ display: 'flex' }}>
               {/* appbar */}
@@ -466,10 +467,12 @@ export default function Layout({ children }) {
 
               {/* 历史记录面板 */}
               <Dialog open={historyDialogOpen} onClose={() => { setHistoryDialog(false) }} fullWidth maxWidth={'lg'}
-              sx={{ zIndex: 'modal', 
-              '& .MuiDialog-paper': {
-                borderRadius: '24px'
-              }}}>
+                sx={{
+                  zIndex: 'modal',
+                  '& .MuiDialog-paper': {
+                    borderRadius: '24px'
+                  }
+                }}>
                 <DialogTitle>
                   历史记录
                   <IconButton
@@ -484,7 +487,7 @@ export default function Layout({ children }) {
                     <CloseIcon />
                   </IconButton>
                 </DialogTitle>
-                <HistoryDialogContent value={history}/>
+                <HistoryDialogContent value={history} />
               </Dialog>
             </Box>
           </HistoryContext.Provider>

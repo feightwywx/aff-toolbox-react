@@ -1,4 +1,6 @@
-module.exports = {
+import type { GatsbyConfig } from "gatsby"
+
+const config: GatsbyConfig = {
   siteMetadata: {
     title: `AFF Toolbox`,
     siteUrl: `https://aff.arcaea.icu`,
@@ -8,7 +10,7 @@ module.exports = {
       resolve: `gatsby-plugin-typescript`,
       options: {
         isTSX: true, // defaults to false
-        jsxPragma: `jsx`, // defaults to "React"
+        jsxPragma: `React`, // defaults to "React"
         allExtensions: true, // defaults to false
       },
     },
@@ -52,5 +54,14 @@ module.exports = {
         },
       }
     },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `aff-modules`,
+        path: `${__dirname}/src/modules`,
+      },
+    },
   ],
 }
+
+export default config;
