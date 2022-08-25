@@ -1,19 +1,19 @@
 import * as Yup from 'yup'
 
 import { AffTextField, NumberField } from './input';
+import { ArcToolPageData, FormData, ToolListItemData } from '../interface';
 import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
 import { Form, Formik, useFormik } from 'formik';
-import { FormData, ToolListItemData } from '../interface';
 import { Trans, useTranslation } from 'react-i18next'
 
+import { HistoryContext } from './history';
 import { PlayArrow } from '@mui/icons-material';
 import React from "react"
 import { graphql } from "gatsby"
 import { useSnackbar } from 'notistack';
 import { useTheme } from '@mui/material/styles';
-import { HistoryContext } from './history';
 
-export default function toolPage({ data }) {
+export default function toolPage({ data } : { data: {[x: string]: any} }) {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
@@ -23,7 +23,7 @@ export default function toolPage({ data }) {
   const pageForm: Array<FormData> = pageContext['form'];
   // 读取表单结构
   let formikInitValues = {};
-  let validationSchema = {};
+  let validationSchema = {} as {[x: string]: any};
   if (pageForm) {
     (pageForm).map((x: FormData) => {
       formikInitValues = { ...formikInitValues, [x.id]: '' }

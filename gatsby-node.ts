@@ -1,4 +1,5 @@
-import { ArcToolModule } from './src/interface'
+import { ArcToolModule, ArcToolPageData } from './src/interface'
+
 import type { GatsbyNode } from "gatsby"
 import path from 'path'
 
@@ -17,7 +18,7 @@ export const createPages: GatsbyNode["createPages"] = async function ({ actions,
   data['allFile']['edges'].forEach((edge: { [x: string]: { [x: string]: any; }; }) => {
     let modulePath = edge['node']['relativePath'];
     let mod = require(path.resolve(`./src/modules/${modulePath}`)) as ArcToolModule;
-    let context = {pagePath: `/${mod.id}`, ...mod}
+    let context = {pagePath: `/${mod.id}`, ...mod} as ArcToolPageData
     actions.createPage({
       path: '/' + mod.id,
       component: path.resolve(`./src/components/tool.tsx`),

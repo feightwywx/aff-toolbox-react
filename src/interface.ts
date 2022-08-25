@@ -23,6 +23,10 @@ export interface ArcToolModule {
   implement?: (input: Object) => ArcToolResult
 }
 
+export interface ArcToolPageData extends ArcToolModule {
+  pagePath: string
+}
+
 export interface ArcToolResult {
   code: number,
   result: string

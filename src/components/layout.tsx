@@ -65,7 +65,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 }));
 
 
-export default function Layout({ children }) {
+export default function Layout({ children } : { children: React.ReactChildren }) {
   const location = useLocation();
   const pathName = location.pathname.split('\\')
   const currentPage = pathName[pathName.length - 1]
@@ -93,7 +93,6 @@ export default function Layout({ children }) {
   const theme = createTheme(
     {
       palette: {
-        type: 'light',
         primary: {
           main: '#846cb3',
           light: '#e0d6f5',
@@ -113,7 +112,6 @@ export default function Layout({ children }) {
           primary: 'rgba(14,7,29,0.83)',
           secondary: 'rgba(14,7,29,0.54)',
           disabled: 'rgba(14,7,29,0.38)',
-          hint: 'rgba(14,7,29,0.38)',
         },
         divider: 'rgba(124,116,125,0.37)',
       },
@@ -225,7 +223,7 @@ export default function Layout({ children }) {
     arc: false,
     timing: false,
     gadget: false,
-  });
+  } as {[x: string]: boolean});
 
   // FIXME 直接进入一个子页面时，Collapse状态不正确
   // FIXME 语言不是默认时，路由会刷新页面
