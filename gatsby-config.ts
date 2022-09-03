@@ -22,13 +22,6 @@ const config: GatsbyConfig = {
         component: path.resolve(`./src/components/layout.tsx`),
       },
     },
-    'gatsby-transformer-json',
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        path: `./src/config/`,
-      },
-    },
     // configuration for react-i18next
     {
       resolve: `gatsby-source-filesystem`,

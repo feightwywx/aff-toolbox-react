@@ -20,10 +20,15 @@ export interface ArcToolModule {
   id: string,
   type: string,
   form: Array<FormData>
-  implement?: (input: Object) => ArcToolResult
+  action?: (input: Object) => ArcToolResult
+}
+
+export interface ArcToolCategory {
+  [categoryId: string]: Array<string>
 }
 
 export interface ArcToolPageData extends ArcToolModule {
+  category: ArcToolCategory
   pagePath: string
 }
 

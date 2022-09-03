@@ -15,6 +15,7 @@ import {
   Toolbar,
   Typography
 } from '@mui/material';
+import { ArcToolModule, HistoryItemData, ToolCategoryData, ToolListItemData } from '../interface'
 import {
   Button,
   IconButton,
@@ -22,9 +23,9 @@ import {
   ListItemButton
 } from 'gatsby-theme-material-ui';
 import { HistoryContext, HistoryDialogContent } from './history';
-import { HistoryItemData, ToolCategoryData, ToolListItemData } from '../interface'
 import { Link as I18Link, useI18next } from 'gatsby-plugin-react-i18next';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
+import { category, newModuleList } from '../config/category';
 import { graphql, useStaticQuery } from 'gatsby'
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -39,6 +40,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import React from "react"
 import { SnackbarProvider } from 'notistack';
 import TranslateIcon from '@mui/icons-material/Translate';
+import { getLangPrefix } from '../utils';
 import { useLocation } from '@reach/router';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { version } from '../config/version';
@@ -65,29 +67,31 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 }));
 
 
-export default function Layout({ children } : { children: React.ReactChildren }) {
+export default function Layout({ children }: { children: React.ReactChildren }) {
   const location = useLocation();
-  const pathName = location.pathname.split('\\')
+  const pathName = location.pathname.split('/')
   const currentPage = pathName[pathName.length - 1]
-  const { languages, originalPath, t, i18n } = useI18next();
+  const { originalPath, t, i18n } = useI18next();
+  const currentLangPrefix = getLangPrefix(i18n.resolvedLanguage);
 
-  const toolData = useStaticQuery(graphql`query ToolListQuery {
-    allConfigJson {
+  const affModuleEdges = useStaticQuery(graphql`query StaticToolQuery {
+    allFile (filter: { sourceInstanceName: { eq: "aff-modules" } }) {
       edges {
         node {
-          toolList {
-            new
-            id
-            type
-          }
-          category
+          relativePath
         }
       }
     }
-  }`)['allConfigJson']['edges'][0]['node']
+  }`)['allFile']['edges']
 
-  const toolListData = toolData['toolList'] as Array<ToolListItemData>
-  const categoryData = toolData['category'] as ToolCategoryData
+  const moduleToCategory = new Map<string, string>();  // 维护一个由模块名到分类名的映射
+  const toolListData = affModuleEdges.map((edge: { [x: string]: { [x: string]: any; }; }) => {
+    const modulePath = edge['node']['relativePath'];
+    const mod = require(`../modules/${modulePath}`) as ArcToolModule;
+    moduleToCategory.set(mod.id, mod.type);
+    return mod;
+  }) as Array<ArcToolModule>
+  const categoryData = category;  // 从config/category.ts读取所有的分类
 
   // 样式
   const theme = createTheme(
@@ -217,57 +221,73 @@ export default function Layout({ children } : { children: React.ReactChildren })
     setDrawerOpen(!drawerOpen);
   };
 
-  const [drawerCollapseState, setDrawerCollapseState] = React.useState({
-    new: true,
-    chart: false,
-    arc: false,
-    timing: false,
-    gadget: false,
-  } as {[x: string]: boolean});
+  // 初始化collapse状态
+  let initDrawerCollapseState = {} as { [x: string]: boolean }
+  categoryData.forEach((cid) => {
+    initDrawerCollapseState = {
+      [cid]: (cid === 'new' || cid === moduleToCategory.get(currentPage)) ? true : false,
+      ...initDrawerCollapseState
+    };
+  })
+  const [drawerCollapseState, setDrawerCollapseState] = React.useState(initDrawerCollapseState);
+  // 跳转时维护collapse状态
+  React.useEffect(() => {
+    const currentCategory = moduleToCategory.get(currentPage)
+    if (currentCategory !== undefined) {
+      setDrawerCollapseState({ ...drawerCollapseState, [currentCategory]: true })
+    }
+  }, [currentPage]);
 
-  // FIXME 直接进入一个子页面时，Collapse状态不正确
-  // FIXME 语言不是默认时，路由会刷新页面
   const drawerContent = (
     <Box sx={{ p: 1 }}>
       <Box sx={{ overflow: 'auto' }}>
         <List dense>
           <Box>
-            <ListItemButton sx={ListItemSx} to='/' selected={location.pathname === '/'}>
+            <ListItemButton sx={ListItemSx} to={`/${currentLangPrefix}`} selected={location.pathname === `/${currentLangPrefix}`}>
               <ListItemText primary={t('home')} sx={{
                 color: theme.palette.text.primary,
               }} />
             </ListItemButton>
           </Box>
+
+          {/* 生成分类 */}
           {categoryData.map((cid, index) => (
             <Box key={cid}>
               <ListItemButton onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [cid]: !drawerCollapseState[cid] }) }}>
                 <ListItemText primary={t(`${cid}.name`)} />
                 {drawerCollapseState[cid] ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
+
               <Collapse in={drawerCollapseState[cid]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding dense sx={{ pl: 2 }}>
-                  {toolListData.filter((data) => (((cid) === 'new') ? data.new : (data.type === cid))).map((data, index) => (
-                    <ListItemButton
-                      LinkComponent={I18Link}
-                      key={index}
-                      sx={ListItemSx}
-                      to={`/${data.id}`}
-                      selected={`/${data.id}` === currentPage && cid !== 'new'}
-                      onClick={() => { setDrawerCollapseState({ ...drawerCollapseState, [data.type]: true }) }}>
-                      <ListItemText primary={t(`${data.id}.name`)} sx={{
-                        color: theme.palette.text.primary,
-                      }} />
-                    </ListItemButton>
-                  ))}
+                  {/* 生成菜单项 */}
+                  {toolListData.filter(
+                    (data) => (cid === 'new' ? newModuleList.includes(data.id) : data.type === cid)
+                  )
+                    .map((data, index) => (
+                      <ListItemButton
+                        LinkComponent={I18Link}
+                        key={index}
+                        sx={ListItemSx}
+                        to={`/${currentLangPrefix}${data.id}`}
+                        selected={`${data.id}` === currentPage && cid !== 'new'}>
+                        <ListItemText primary={t(`${data.id}.name`)} sx={{
+                          color: theme.palette.text.primary,
+                        }} />
+                      </ListItemButton>
+                    ))}
                 </List>
               </Collapse>
+
             </Box>
           ))}
+
         </List>
       </Box>
     </Box>
   )
 
+  // 只需要执行一次的东西
   React.useEffect(() => {
     console.log(`%cAFF Toolbox%c${version}%c\nBuild with React and Love :)`,
       'background: #e0d6f5; color: #59446f; padding: 2px',

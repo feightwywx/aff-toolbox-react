@@ -14,18 +14,20 @@ import {
   Button,
   Link as GatsbyLink,
 } from 'gatsby-theme-material-ui';
-import { Link as I18Link, Trans, useTranslation } from 'gatsby-plugin-react-i18next';
+import { Link as I18Link, Trans, useI18next, useTranslation } from 'gatsby-plugin-react-i18next';
 import { faBilibili, faGithub, faTwitter } from '@fortawesome/free-brands-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { getLangPrefix } from "../utils";
 import { graphql } from 'gatsby';
 import { useTheme } from '@mui/material/styles';
 
-// markup
 const IndexPage = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
+  const { i18n } = useI18next();
+  const currentLangPrefix = getLangPrefix(i18n.resolvedLanguage)
 
   return (
     <Box>
@@ -53,12 +55,15 @@ const IndexPage = () => {
                 这个<GatsbyLink href='https://www.bilibili.com/video/BV1RR4y1J7sL' underline="hover" color='secondary'>介绍视频</GatsbyLink>有各个工具的结果预览，
                 请根据您的需要选用。同时，向您推荐这几个最受欢迎的工具：
               </Typography>
-              <Grid container spacing={{ xs: 1, md: 2 }}
+              <Grid container spacing={0}
                 justifyContent="flex-start"
                 alignItems="stretch"
-                sx={{ m: 0, pr: { xs: 2, md: 4 } }}>
+                sx={{ m: 0, pr: 0 }}>
                 <Grid item xs={12} sm={4}>
-                  <Card variant="outlined">
+                  <Card variant="outlined" sx={{
+                    mb: { xs: 2, md: 'auto' },
+                    mr: { xs: 'auto', md: 2 }
+                  }}>
                     <CardContent>
                       <Typography variant="h5">
                         Arc分割
@@ -70,12 +75,15 @@ const IndexPage = () => {
                       </Box>
                     </CardContent>
                     <CardActions>
-                      <Button size="small" to='/arc-cutter'>尝试一下</Button>
+                      <Button size="small" to={`/${currentLangPrefix}arc-cutter`}>尝试一下</Button>
                     </CardActions>
                   </Card>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <Card variant="outlined">
+                  <Card variant="outlined" sx={{
+                    mb: { xs: 2, md: 'auto' },
+                    mr: { xs: 'auto', md: 2 }
+                  }}>
                     <CardContent>
                       <Typography variant="h5">
                         谱面偏移
@@ -87,7 +95,7 @@ const IndexPage = () => {
                       </Box>
                     </CardContent>
                     <CardActions>
-                      <Button size="small" to='/chart-offset'>尝试一下</Button>
+                      <Button size="small" to={`/${currentLangPrefix}chart-offset`}>尝试一下</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -104,7 +112,7 @@ const IndexPage = () => {
                       </Box>
                     </CardContent>
                     <CardActions>
-                      <Button size="small" to='/timing-easing'>尝试一下</Button>
+                      <Button size="small" to={`/${currentLangPrefix}timing-easing`}>尝试一下</Button>
                     </CardActions>
                   </Card>
                 </Grid>
