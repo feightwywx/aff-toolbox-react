@@ -37,9 +37,9 @@ npm run build
 
 本项目自定义了一套表单API，以便生成易于维护的大量表单。添加新页面需要在`ArcToolModule.form`中声明工具需要的表单。
 
-`FormData`用于声明一个控件。`ArcToolModule`中的`form`属性实际上存储了一个`FormData`数组，在需要时，渲染引擎会将`FormData`数组渲染为包含输入检查、提交及各种额外功能的表单。
+`FieldData`用于声明一个控件。`ArcToolModule`中的`form`属性实际上存储了一个`FieldData`数组，在需要时，渲染引擎会将`FieldData`数组渲染为包含输入检查、提交及各种额外功能的表单。
 
-### `FormData`的属性
+### `FieldData`的属性
 
 #### `type`
 

@@ -2,14 +2,14 @@ export interface ToolListItemData {
   new: boolean,
   type: string,
   id: string,
-  form: Array<FormData>
+  form: Array<FieldData>
 }
 
 export type ToolCategoryData = Array<string>
 
 export type FormatOption = 'withArcTap' | 'positive' | 'nonNegative' | 'int' | 'float'
 
-export interface FormData {
+export interface FieldData {
   type: 'aff' | 'arc' | 'number' | 'bezier' | 'easing',
   id: string,
   format?: Array<FormatOption>,
@@ -19,7 +19,7 @@ export interface FormData {
 export interface ArcToolModule {
   id: string,
   type: string,
-  form: Array<FormData>
+  form: Array<FieldData>
   action?: (input: Object) => ArcToolResult
 }
 

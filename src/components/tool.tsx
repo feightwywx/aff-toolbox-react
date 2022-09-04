@@ -1,10 +1,11 @@
 import * as Yup from 'yup'
 
 import { AffTextField, NumberField } from './input';
-import { ArcToolPageData, FormData, ToolListItemData } from '../interface';
+import { ArcToolPageData, FieldData, ToolListItemData } from '../interface';
 import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
-import { Form, Formik, useFormik } from 'formik';
+import { Form, Formik, useField, useFormik, useFormikContext } from 'formik';
 import { Trans, useTranslation } from 'react-i18next'
+import { fieldParser, validationParser } from './formUtil';
 
 import { HistoryContext } from './history';
 import { PlayArrow } from '@mui/icons-material';
@@ -13,46 +14,29 @@ import { graphql } from "gatsby"
 import { useSnackbar } from 'notistack';
 import { useTheme } from '@mui/material/styles';
 
-export default function toolPage({ data } : { data: {[x: string]: any} }) {
+export default function toolPage({ data }: { data: { [x: string]: any } }) {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
 
   const pageContext: ToolListItemData = data['allSitePage']['nodes'][0]['pageContext'];
   const pageId = pageContext['id'];
-  const pageForm: Array<FormData> = pageContext['form'];
+  const pageForm: Array<FieldData> = pageContext['form'];
   // 读取表单结构
   let formikInitValues = {};
-  let validationSchema = {} as {[x: string]: any};
+  let validationSchema = {} as { [x: string]: any };
   if (pageForm) {
-    (pageForm).map((x: FormData) => {
-      formikInitValues = { ...formikInitValues, [x.id]: '' }
-
-      if (x.type === 'number') {
-        validationSchema[x.id] = Yup.number().typeError('请输入一个数值')
-        if (x.format && 'int' in x.format) {
-          validationSchema[x.id] = validationSchema[x.id].integer('值不能为小数');
-        }
-
-        if (x.format && 'nonNegative' in x.format) {
-          validationSchema[x.id] = validationSchema[x.id].min(0, '值不能为负数');
-        }
-
-      } else if (x.type === 'aff') {
-        validationSchema[x.id] = Yup.string()
-      } else {
-        console.warn(`[AFF Toolbox] 表单生成工具未生成以下验证：不支持${x.type}类型\n页面ID：${pageId}\n控件声明：\n${JSON.stringify(x, null, 2)}`);
-      }
-
-      if (x.required) {
-        validationSchema[x.id] = validationSchema[x.id].required('不能为空');
-      }
+    pageForm.map((x: FieldData) => {
+      formikInitValues = { ...formikInitValues, [x.id]: '' };
+      validationSchema = { ...validationSchema, [x.id]: React.useMemo(() => validationParser(x), [x]) };
     })
   }
-
+  // 渲染表单
+  const formComponents = React.useMemo(() => pageForm.map(fieldParser), [pageForm])
+  
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-  const {history, setHistory} = React.useContext(HistoryContext)
+  const { history, setHistory } = React.useContext(HistoryContext)
 
   return (
     <Box>
@@ -80,52 +64,40 @@ export default function toolPage({ data } : { data: {[x: string]: any} }) {
             enqueueSnackbar("结果已生成，但是复制失败。请检查历史记录面板。", { variant: 'warning' });
           }
         }}>
-        <Form>
-          <Stack spacing={2} sx={{ mb: 2 }}>
-            {/* 主要部分 */}
-            <Card>
-              <CardContent>
-                <Grid container spacing={2}>
-                  {pageForm.map((x: FormData) => {
-                    if (x.type === 'aff') {
-                      return (
-                        <Grid key={x.id} item xs={12}>
-                          <AffTextField
-                            name={x.id}
-                            id={x.id}
-                            type='text'
-                          />
-                        </Grid>
-                      )
-                    } else if (x.type === 'number') {
-                      return (
-                        <Grid key={x.id} item xs={12} sm={6} md={4}>
-                          <NumberField
-                            name={x.id}
-                            id={x.id}
-                            type='text'
-                          />
-                        </Grid>
-                      )
-                    } else {
-                      console.warn(`[AFF Toolbox] 表单生成工具未生成以下控件：不支持${x.type}类型\n页面ID：${pageId}\n控件声明：\n${JSON.stringify(x, null, 2)}`);
-                    }
-                  })}
-                </Grid>
-              </CardContent>
-            </Card>
-          </Stack>
-          <Fab variant="extended" type='submit' color='secondary' sx={{
-            boxShadow: 2,
-            position: 'fixed',
-            bottom: (theme) => theme.spacing(4),
-            right: (theme) => theme.spacing(4)
-          }}
-          >
-            <PlayArrow sx={{ mr: 1 }} />
-            生成并复制
-          </Fab>
-        </Form>
+        {({ errors, touched }) => (
+          <Form>
+            <Stack spacing={2} sx={{ mb: 2 }}>
+              {/* 主要部分 */}
+              <Card>
+                <CardContent>
+                  <Grid container spacing={2}>
+                    {formComponents}
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Stack>
+            <Fab variant="extended" type='submit' color='secondary' sx={{
+              boxShadow: 2,
+              position: 'fixed',
+              bottom: (theme) => theme.spacing(4),
+              right: (theme) => theme.spacing(4)
+            }}
+              onClick={() => {
+                const errKeys = Object.keys(errors);
+                const touchedKeys = Object.keys(touched);
+                if (touchedKeys.length === 0) {
+                  enqueueSnackbar('在提交之前...至少动点什么吧？', { variant: 'default' })
+                } else if (errKeys.length !== 0) {
+                  enqueueSnackbar(`请检查以下字段：${errKeys.map(e => t(e))}`, { variant: 'error' })
+                }
+              }}
+            >
+              <PlayArrow sx={{ mr: 1 }} />
+              生成并复制
+            </Fab>
+          </Form>
+        )}
+
       </Formik>
     </Box>
   );
