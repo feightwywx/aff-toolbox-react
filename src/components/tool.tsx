@@ -2,13 +2,13 @@ import * as Yup from 'yup'
 
 import { AffTextField, NumberField } from './input';
 import { ArcToolPageData, FieldData, ToolListItemData } from '../interface';
-import { Box, Card, CardContent, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
+import { Box, Card, CardContent, CircularProgress, Fab, Grid, Stack, TextField, Typography, useMediaQuery } from '@mui/material'
+import { CallToActionSharp, PlayArrow } from '@mui/icons-material';
 import { Form, Formik, useField, useFormik, useFormikContext } from 'formik';
 import { Trans, useTranslation } from 'react-i18next'
 import { fieldParser, validationParser } from './formUtil';
 
 import { HistoryContext } from './history';
-import { PlayArrow } from '@mui/icons-material';
 import React from "react"
 import { graphql } from "gatsby"
 import { useSnackbar } from 'notistack';
@@ -22,6 +22,7 @@ export default function toolPage({ data }: { data: { [x: string]: any } }) {
   const pageContext: ToolListItemData = data['allSitePage']['nodes'][0]['pageContext'];
   const pageId = pageContext['id'];
   const pageForm: Array<FieldData> = pageContext['form'];
+  
   // 读取表单结构
   let formikInitValues = {};
   let validationSchema = {} as { [x: string]: any };
@@ -33,7 +34,7 @@ export default function toolPage({ data }: { data: { [x: string]: any } }) {
   }
   // 渲染表单
   const formComponents = React.useMemo(() => pageForm.map(fieldParser), [pageForm])
-  
+
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const { history, setHistory } = React.useContext(HistoryContext)
@@ -47,7 +48,7 @@ export default function toolPage({ data }: { data: { [x: string]: any } }) {
       <Formik
         initialValues={formikInitValues}
         validationSchema={Yup.object(validationSchema)}
-        onSubmit={values => {
+        onSubmit={(values, actions) => {
           if (navigator.clipboard !== undefined) {
             navigator.clipboard.writeText(JSON.stringify(values, null, 2));
             if (history !== null) {
@@ -63,8 +64,12 @@ export default function toolPage({ data }: { data: { [x: string]: any } }) {
             console.warn('[AFF Toolbox] 无法访问剪贴板，这可能是因为权限不足，浏览器过旧或页面不来自一个安全的来源。')
             enqueueSnackbar("结果已生成，但是复制失败。请检查历史记录面板。", { variant: 'warning' });
           }
+          setTimeout(() => {
+            actions.setSubmitting(false);
+          }, 1000)
+
         }}>
-        {({ errors, touched }) => (
+        {({ errors, touched, isSubmitting, setSubmitting }) => (
           <Form>
             <Stack spacing={2} sx={{ mb: 2 }}>
               {/* 主要部分 */}
@@ -76,6 +81,7 @@ export default function toolPage({ data }: { data: { [x: string]: any } }) {
                 </CardContent>
               </Card>
             </Stack>
+
             <Fab variant="extended" type='submit' color='secondary' sx={{
               boxShadow: 2,
               position: 'fixed',
@@ -91,8 +97,13 @@ export default function toolPage({ data }: { data: { [x: string]: any } }) {
                   enqueueSnackbar(`请检查以下字段：${errKeys.map(e => t(e))}`, { variant: 'error' })
                 }
               }}
+              disabled={isSubmitting}
             >
-              <PlayArrow sx={{ mr: 1 }} />
+              {
+                isSubmitting ?
+                  <CircularProgress color="inherit" size={20} sx={{ mr: 1.5 }} /> :
+                  <PlayArrow sx={{ mr: 1 }} />
+              }
               生成并复制
             </Fab>
           </Form>
