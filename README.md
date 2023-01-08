@@ -1,8 +1,10 @@
+**注意：这是一个未实装版本。**
+
+如果您要找AFF工具箱的前端源代码，请看这里：[feightwywx/aff.arcaea.icu](https://github.com/feightwywx/aff.arcaea.icu)
+
 # aff-toolbox-react
 
-[AFF工具箱 -observer-](https://aff.arcaea.icu) 的前端仓库，基于 [React](https://reactjs.org/)，[Gatsby](https://www.gatsbyjs.com/) 和 [MUI](https://mui.com/)。
-
-旧版本：[feightwywx/aff.arcaea.icu](https://github.com/feightwywx/aff.arcaea.icu)
+AFF工具箱 -observer- 的前端仓库，基于 [React](https://reactjs.org/)，[Gatsby](https://www.gatsbyjs.com/) 和 [MUI](https://mui.com/)。
 
 ## 这是什么？
 
