@@ -1,4 +1,10 @@
-**注意：这是一个未实装版本。**
+# Notice: Deprecated!
+
+This repo has been deprecated and archived.
+
+For further development on AFF Toolbox: [aff-toolbox](https://github.com/feightwywx/aff-toolbox)
+
+# **注意：这是一个未实装版本。**
 
 如果您要找AFF工具箱的前端源代码，请看这里：[feightwywx/aff.arcaea.icu](https://github.com/feightwywx/aff.arcaea.icu)
 
